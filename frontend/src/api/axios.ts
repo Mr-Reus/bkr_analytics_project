@@ -2,13 +2,15 @@ import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export const api = axios.create({
+const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true
+    // withCredentials: true <-- ОБОВ'ЯЗКОВО ЗАКОМЕНТУЙТЕ АБО ВИДАЛІТЬ ЦЕЙ РЯДОК
 });
+
+
 
 api.interceptors.request.use(
     (config) => {
@@ -31,3 +33,5 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+export default api;

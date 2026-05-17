@@ -42,7 +42,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 import PlotlyChart from "react-plotly.js";
-import { api } from "../api/axios";
+import  api from "../api/axios";
 
 const Plot = (PlotlyChart as any).default || PlotlyChart;
 const drawerWidth = 240;

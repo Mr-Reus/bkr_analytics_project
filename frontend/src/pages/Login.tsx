@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography, Paper, Alert, CssBaseline } from '@mui/material';
-import { api } from '../api/axios';
+import  api  from '../api/axios';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
