@@ -307,7 +307,7 @@ export const Dashboard: React.FC = () => {
     fetchTenantKey,
     fetchAnalysts,
   ]);
-
+  
   const handleCreateAnalyst = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -348,7 +348,7 @@ export const Dashboard: React.FC = () => {
       fetchAnalysts();
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch {
-      setError("Не вдалося видалити обрану сутність.");
+      setError("Не вдалося видалити обрану сутність");
     }
   };
 
@@ -408,7 +408,7 @@ export const Dashboard: React.FC = () => {
         setTimeout(() => setSuccessMsg(""), 4000);
       }, 4000);
     } catch {
-      setError("Помилка запуску сегментації.");
+      setError("Помилка запуску сегментації");
       setLoading(false);
     }
   };
@@ -788,7 +788,7 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                       {kpis?.total_customers || "0"}
+                      {kpis?.total_customers || "0"}
                     </Typography>
                   )}
                   <Typography
@@ -800,6 +800,7 @@ export const Dashboard: React.FC = () => {
                   </Typography>
                 </Paper>
               </Grid>
+              
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper
                   elevation={0}
@@ -838,7 +839,8 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                       ${formatCurrency(
+                      
+                      {formatCurrency(
                         kpis && kpis.total_customers > 0
                           ? kpis.total_revenue / kpis.total_customers
                           : 0,
@@ -1220,6 +1222,7 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
+
         {currentView === "RFM Segmentation" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
@@ -1329,7 +1332,6 @@ export const Dashboard: React.FC = () => {
             </Box>
 
             <Grid container spacing={4} sx={{ alignItems: "stretch" }}>
-              {/* Блок токена інтеграції */}
               <Grid size={{ xs: 12, md: 5 }}>
                 <Paper
                   elevation={0}
@@ -1433,7 +1435,7 @@ export const Dashboard: React.FC = () => {
                     Створення нових облікових записів з обмеженими правами
                     доступу до аналітичного рушія системи
                   </Typography>
-
+                  
                   <Box
                     component="form"
                     onSubmit={handleCreateAnalyst}
