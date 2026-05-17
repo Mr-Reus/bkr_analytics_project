@@ -1,0 +1,17 @@
+.env
+.env.*
+
+venv/
+env/
+backend/venv/
+__pycache__/
+*.py[cod]
+
+*.xlsx
+*.csv
+online_retail_II.xlsx
+
+node_modules/
+frontend/node_modules/
+dist/
+build/

@@ -14,15 +14,19 @@
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^9.0.0",
     "axios": "^1.15.2",
+    "plotly.js": "^3.5.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-router-dom": "^7.14.2"
+    "react-plotly.js": "^2.6.0",
+    "react-router-dom": "^7.14.2",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/react-plotly.js": "^2.6.4",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",
