@@ -840,7 +840,7 @@ export const Dashboard: React.FC = () => {
                       }}
                     >
                       
-                      {formatCurrency(
+                      ${formatCurrency(
                         kpis && kpis.total_customers > 0
                           ? kpis.total_revenue / kpis.total_customers
                           : 0,
