@@ -788,7 +788,7 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                      {kpis?.total_customers || "0"}
+                       {kpis?.total_customers || "0"}
                     </Typography>
                   )}
                   <Typography
@@ -838,7 +838,7 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                      {formatCurrency(
+                       ${formatCurrency(
                         kpis && kpis.total_customers > 0
                           ? kpis.total_revenue / kpis.total_customers
                           : 0,
