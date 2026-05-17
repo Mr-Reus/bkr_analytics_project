@@ -1,16 +1,15 @@
 import axios from 'axios';
 
-// Базова URL-адреса вашого FastAPI бекенду
-const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
-export const api = axios.create({
+const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true
 });
 
-// Інтерцептор для автоматичного додавання JWT токена
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('access_token');
@@ -22,13 +21,12 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Інтерцептор для обробки прострочених токенів (401)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('access_token');
-            window.location.href = '/'; // Перенаправлення на сторінку входу
+            window.location.href = '/';
         }
         return Promise.reject(error);
     }

@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 
-// ВИПРАВЛЕННЯ: Використовуємо React.ReactNode для правильної типізації children
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     const token = localStorage.getItem('access_token');
     return token ? <>{children}</> : <Navigate to="/" />;

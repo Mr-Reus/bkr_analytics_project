@@ -21,7 +21,6 @@ import json
 
 from ml_pipeline import BKRMachineLearningPipeline
 
-# Завантаження конфігурацій
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -31,7 +30,6 @@ INVITE_CODE_HASH = os.getenv("INVITE_CODE_HASH")
 if not DATABASE_URL or not SECRET_KEY:
     raise ValueError("Помилка: DATABASE_URL або JWT_SECRET_KEY не знайдено у файлі .env чи середовищі")
 
-# Ініціалізація БД
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 ALGORITHM = "HS256"
@@ -40,7 +38,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
-# --- Налаштування APScheduler ---
 scheduler = AsyncIOScheduler()
 
 
@@ -84,17 +81,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="BKR E-commerce Analytics API", version="2.0.0", lifespan=lifespan)
 
-# --- Налаштування CORS (Відкрито для локальної розробки та хмари Vercel) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Дозволяє запити з будь-якого хосту (включаючи localhost та Vercel)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# --- Валідаційні моделі Pydantic ---
 class AdminRegister(BaseModel):
     company_name: str
     email: EmailStr
@@ -129,7 +123,6 @@ class MiningParams(BaseModel):
     min_threshold: float = 0.5
 
 
-# --- Допоміжні функції безпеки ---
 def create_access_token(data: dict):
     to_encode = data.copy()
     to_encode.update({"exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)})
@@ -164,7 +157,6 @@ async def require_admin(current_user: dict = Depends(get_current_user)):
     return current_user
 
 
-# --- МАРШРУТИ: АВТОРИЗАЦІЯ ---
 auth_router = APIRouter(prefix="/api/auth", tags=["1. Authentication"])
 
 
@@ -207,7 +199,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             "token_type": "bearer"}
 
 
-# --- МАРШРУТИ: АДМІНІСТРУВАННЯ ---
 main_router = APIRouter()
 
 
@@ -269,7 +260,6 @@ async def get_key(admin: dict = Depends(require_admin)):
     return {"tenant_key": key}
 
 
-# --- МАРШРУТИ: АНАЛІТИКА ---
 @main_router.get("/api/analytics/kpis", tags=["3. Analytics"])
 async def get_kpis(user: dict = Depends(get_current_user)):
     with engine.connect() as conn:
@@ -320,8 +310,6 @@ async def export_json(report_type: str = 'rfm_analysis', current_user: dict = De
     payload = result[0] if not isinstance(result[0], str) else json.loads(result[0])
     return payload
 
-
-# --- МАРШРУТИ: ETL ІНТЕГРАЦІЯ ---
 @app.get("/verify-me", tags=["4. ETL"])
 async def verify(x_tenant_key: str = Header(None)):
     if not x_tenant_key: raise HTTPException(status_code=401)

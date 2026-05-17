@@ -1,11 +1,23 @@
 .env
 .env.*
+*.pem
 
 venv/
 env/
 backend/venv/
 __pycache__/
 *.py[cod]
+
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.pytest_cache/
+analysis_results/
+
+config.json
+backend/config.json
 
 *.xlsx
 *.csv
@@ -15,3 +27,11 @@ node_modules/
 frontend/node_modules/
 dist/
 build/
+
+npm-debug.log
+yarn-error.log
+
+# IDE та ОС
+.vscode/
+.idea/
+.DS_Store

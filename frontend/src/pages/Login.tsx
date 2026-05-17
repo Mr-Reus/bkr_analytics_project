@@ -8,11 +8,10 @@ export const Login: React.FC = () => {
     const navigate = useNavigate();
     const [isRegister, setIsRegister] = useState(false);
     
-    // Стан форми
     const [companyName, setCompanyName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [inviteCode, setInviteCode] = useState(''); // ДОДАНО СТАН ДЛЯ КОДУ
+    const [inviteCode, setInviteCode] = useState(''); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -23,17 +22,15 @@ export const Login: React.FC = () => {
 
         try {
             if (isRegister) {
-                // РЕЄСТРАЦІЯ НОВОГО АДМІНІСТРАТОРА ТА КОМПАНІЇ
                 const response = await api.post('/api/auth/register/admin', {
                     company_name: companyName,
                     email: email,
                     password: password,
-                    invite_code: inviteCode // ПЕРЕДАЄМО КОД НА БЕКЕНД
+                    invite_code: inviteCode
                 });
                 localStorage.setItem('access_token', response.data.access_token);
                 navigate('/dashboard');
             } else {
-                // ВХІД ІСНУЮЧОГО КОРИСТУВАЧА
                 const formData = new URLSearchParams();
                 formData.append('username', email);
                 formData.append('password', password);
@@ -76,7 +73,6 @@ export const Login: React.FC = () => {
                                 value={companyName}
                                 onChange={(e) => setCompanyName(e.target.value)}
                             />
-                            {/* ДОДАНЕ ПОЛЕ ДЛЯ СЕКРЕТНОГО КОДУ */}
                             <TextField
                                 fullWidth
                                 label="Invite Code (Код доступу)"
