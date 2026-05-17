@@ -44,7 +44,6 @@ import type { TooltipProps } from "recharts";
 import PlotlyChart from "react-plotly.js";
 import { api } from "../api/axios";
 
-// Безпечний імпорт компонента Plotly для збирача Vite
 const Plot = (PlotlyChart as any).default || PlotlyChart;
 const drawerWidth = 240;
 
@@ -129,12 +128,12 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 const formatCurrency = (value: number | undefined): string => {
   if (value === undefined || isNaN(value)) return "0.00";
   if (value >= 1000000) {
-    return (value / 1000000).toFixed(2) + "M"; // Наприклад: 1.67M
+    return (value / 1000000).toFixed(2) + "M"; 
   }
   if (value >= 1000) {
-    return (value / 1000).toFixed(1) + "K"; // Наприклад: 450.5K
+    return (value / 1000).toFixed(1) + "K"; 
   }
-  return value.toFixed(2); // Для звичайних сум: 428.00
+  return value.toFixed(2); 
 };
 
 export const Dashboard: React.FC = () => {
@@ -144,28 +143,22 @@ export const Dashboard: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
 
-  // --- СТАН КОРИСТУВАЧА ---
   const [userNickname, setUserNickname] = useState<string>("User");
 
-  // --- СТАНИ СИСТЕМИ (OVERVIEW) ---
   const [kpis, setKpis] = useState<KPIData | null>(null);
 
-  // --- СТАНИ АДМІНІСТРАТОРА (TENANT SETTINGS CRUD) ---
   const [tenantKey, setTenantKey] = useState<string>("");
   const [analysts, setAnalysts] = useState<AnalystUser[]>([]);
   const [newAnalystEmail, setNewAnalystEmail] = useState<string>("");
   const [newAnalystPassword, setNewAnalystPassword] = useState<string>("");
 
-  // --- СТАНИ FP-GROWTH ---
   const [minSupport, setMinSupport] = useState<number>(0.01);
   const [minConfidence, setMinConfidence] = useState<number>(0.5);
   const [rules, setRules] = useState<AssociationRule[]>([]);
   const [lastFpTime, setLastFpTime] = useState<number>(0);
 
-  // --- СТАНИ RFM ---
   const [rfmData, setRfmData] = useState<RFMCustomer[]>([]);
 
-  // --- СТАНИ ЗУМУ (FP-Growth) ---
   const [refAreaLeft, setRefAreaLeft] = useState<number | null>(null);
   const [refAreaRight, setRefAreaRight] = useState<number | null>(null);
   const [refAreaTop, setRefAreaTop] = useState<number | null>(null);
@@ -186,7 +179,6 @@ export const Dashboard: React.FC = () => {
     setIsZoomed(false);
   }, []);
 
-  // --- ДЕКОДУВАННЯ ТОКЕНА ДЛЯ ЮЗЕРНЕЙМА ---
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (token) {
@@ -200,7 +192,6 @@ export const Dashboard: React.FC = () => {
     }
   }, []);
 
-  // --- ФУНКЦІЇ ЗАВАНТАЖЕННЯ ДАНИХ (READ ОПЕРАЦІЇ) ---
   const fetchKPIs = useCallback(async () => {
     setLoading(true);
     try {
@@ -295,7 +286,6 @@ export const Dashboard: React.FC = () => {
     }
   }, []);
 
-  // Центральний диспетчер контексту інтерфейсу користувача
   useEffect(() => {
     setError("");
     setSuccessMsg("");
@@ -318,7 +308,6 @@ export const Dashboard: React.FC = () => {
     fetchAnalysts,
   ]);
 
-  // --- ОБРОБНИКИ КЕРУВАННЯ ТА ОБЧИСЛЕНЬ (CREATE / DELETE ОПЕРАЦІЇ) ---
   const handleCreateAnalyst = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -489,7 +478,6 @@ export const Dashboard: React.FC = () => {
     navigate("/");
   };
 
-  // --- ВІЗУАЛІЗАЦІЯ КОМПОНЕНТІВ ГРАФІКІВ ---
   const renderRFMPlot = () => {
     if (rfmData.length === 0) return null;
     const colors = [
@@ -698,9 +686,6 @@ export const Dashboard: React.FC = () => {
           </Alert>
         )}
 
-        {/* =====================================================================
-                    1. РОБОЧИЙ ПРОСТІР: DASHBOARD OVERVIEW
-                    ===================================================================== */}
         {currentView === "Dashboard Overview" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
@@ -716,7 +701,6 @@ export const Dashboard: React.FC = () => {
             </Box>
 
             <Grid container spacing={4} sx={{ mb: 5 }}>
-              {/* Картка 1: Загальний Валовий Дохід */}
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper
                   elevation={0}
@@ -755,7 +739,6 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                      {/* ВИПРАВЛЕНО: Формат $1.67M замість мільйонного рядка з центами */}
                       ${formatCurrency(kpis?.total_revenue)}
                     </Typography>
                   )}
@@ -767,8 +750,6 @@ export const Dashboard: React.FC = () => {
                   </Typography>
                 </Paper>
               </Grid>
-
-              {/* Картка 2: Активна база клієнтів */}
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper
                   elevation={0}
@@ -807,7 +788,6 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                      {/* ВИПРАВЛЕНО: Чисте суцільне число (наприклад, 1765) без ком чи скорочень */}
                       {kpis?.total_customers || "0"}
                     </Typography>
                   )}
@@ -820,8 +800,6 @@ export const Dashboard: React.FC = () => {
                   </Typography>
                 </Paper>
               </Grid>
-
-              {/* Картка 3: Середній чек клієнта */}
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Paper
                   elevation={0}
@@ -860,7 +838,6 @@ export const Dashboard: React.FC = () => {
                         fontSize: { xs: "2rem", md: "2.5rem" },
                       }}
                     >
-                      {/* ВИПРАВЛЕНО: Компактний формат для середнього чеку */}$
                       {formatCurrency(
                         kpis && kpis.total_customers > 0
                           ? kpis.total_revenue / kpis.total_customers
@@ -918,9 +895,6 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {/* =====================================================================
-                    2. РОБОЧИЙ ПРОСТІР: MARKET BASKET RULES (FP-GROWTH)
-                    ===================================================================== */}
         {currentView === "Market Basket Rules" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
@@ -1246,9 +1220,6 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {/* =====================================================================
-                    3. РОБОЧИЙ ПРОСТІР: RFM SEGMENTATION
-                    ===================================================================== */}
         {currentView === "RFM Segmentation" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
@@ -1342,9 +1313,6 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {/* =====================================================================
-                    4. РОБОЧИЙ ПРОСТІР: TENANT SETTINGS (ПОВНИЙ АДМІНІСТРАТИВНИЙ CRUD)
-                    ===================================================================== */}
         {currentView === "Tenant Settings" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
@@ -1444,7 +1412,6 @@ export const Dashboard: React.FC = () => {
                 </Paper>
               </Grid>
 
-              {/* Блок CRUD форми створення аналітиків */}
               <Grid size={{ xs: 12, md: 7 }}>
                 <Paper
                   elevation={0}
@@ -1467,7 +1434,6 @@ export const Dashboard: React.FC = () => {
                     доступу до аналітичного рушія системи
                   </Typography>
 
-                  {/* Форма з більшими інпутами та відступами */}
                   <Box
                     component="form"
                     onSubmit={handleCreateAnalyst}
@@ -1538,7 +1504,6 @@ export const Dashboard: React.FC = () => {
                 </Paper>
               </Grid>
 
-              {/* Таблиця перегляду та видалення користувачів (READ / DELETE) */}
               <Grid size={{ xs: 12 }}>
                 <Paper
                   elevation={0}
