@@ -27,7 +27,7 @@ class BKRLocalCollector:
         self.root.geometry("950x850")
         self.root.configure(bg=COLOR_BG)
 
-        self.cloud_url = "http://127.0.0.1:8000"
+        self.cloud_url = "https://bkr-analytics-api.onrender.com"
         self.load_configuration()
         self.setup_ui()
 
@@ -265,7 +265,7 @@ class BKRLocalCollector:
         tenant_key = self.key_entry.get().strip()
         headers = {"X-Tenant-Key": tenant_key}
 
-        MAIN_LIMIT = 25000
+        MAIN_LIMIT = 1000
 
         try:
             base_query = meta['query'].strip()
