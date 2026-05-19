@@ -265,7 +265,7 @@ class BKRLocalCollector:
         tenant_key = self.key_entry.get().strip()
         headers = {"X-Tenant-Key": tenant_key}
 
-        MAIN_LIMIT = 1000
+        MAIN_LIMIT = 25000
 
         try:
             base_query = meta['query'].strip()
