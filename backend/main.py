@@ -14,10 +14,13 @@ import io
 import pandas as pd
 from sqlalchemy import create_engine, text
 from passlib.context import CryptContext
+from google import genai
 from jose import JWTError, jwt
 from dotenv import load_dotenv
 import hashlib
 import json
+from business_insights import insights_router
+
 
 from ml_pipeline import BKRMachineLearningPipeline
 
@@ -412,6 +415,7 @@ async def complex_sync(batch: SyncBatch, x_tenant_key: str = Header(None)):
 
 app.include_router(auth_router)
 app.include_router(main_router)
+app.include_router(insights_router)
 
 if __name__ == "__main__":
     import uvicorn

@@ -10,8 +10,8 @@ import json
 from sqlalchemy import create_engine, text
 
 COLOR_BG = "#F0F2F5"
-COLOR_PRIMARY = "#0078D4"  # Синій (Первинне завантаження)
-COLOR_SECONDARY = "#2B88D8"  # Світло-синій (Дельта)
+COLOR_PRIMARY = "#0078D4"  # синій (первинне завантаження)
+COLOR_SECONDARY = "#2B88D8"  # світло-синій (дельта)
 COLOR_SUCCESS = "#107C10"
 COLOR_ERROR = "#A4262C"
 COLOR_TEXT = "#333333"
@@ -69,7 +69,6 @@ class BKRLocalCollector:
         style.configure("TLabelframe", background=COLOR_BG)
         style.configure("TLabelframe.Label", font=("Segoe UI Semibold", 10), background=COLOR_BG, foreground=COLOR_TEXT)
 
-        # Блок налаштувань
         auth_frame = ttk.LabelFrame(main_container, text=" Параметри підключення ")
         auth_frame.pack(fill="x", pady=(0, 20), ipady=5)
 
@@ -91,12 +90,11 @@ class BKRLocalCollector:
                                     command=self.verify_all)
         self.btn_verify.pack(side="left", padx=5)
 
-        self.btn_settings = tk.Button(f1, text="⚙️ Налаштування", bg="#555555", fg="white",
+        self.btn_settings = tk.Button(f1, text=" Налаштування", bg="#555555", fg="white",
                                       font=("Segoe UI Bold", 10), relief="flat", padx=15, pady=4, cursor="hand2",
                                       command=self.open_settings)
         self.btn_settings.pack(side="left", padx=5)
 
-        # Блок статусів
         status_frame = tk.Frame(main_container, bg="white", highlightbackground=COLOR_BORDER, highlightthickness=1)
         status_frame.pack(fill="x", pady=(0, 25))
 
@@ -104,25 +102,24 @@ class BKRLocalCollector:
         p.pack(padx=20, pady=12, anchor="w")
 
         font_st = ("Segoe UI Semibold", 10)
-        self.st_cloud = tk.Label(p, text="☁️ Cloud API: --", bg="white", font=font_st, fg="#666666")
+        self.st_cloud = tk.Label(p, text=" Cloud API: --", bg="white", font=font_st, fg="#666666")
         self.st_cloud.pack(side="left", padx=(0, 40))
-        self.st_pg = tk.Label(p, text="🐘 Postgres: --", bg="white", font=font_st, fg="#666666")
+        self.st_pg = tk.Label(p, text=" Postgres: --", bg="white", font=font_st, fg="#666666")
         self.st_pg.pack(side="left", padx=40)
-        self.st_my = tk.Label(p, text="🐬 MySQL: --", bg="white", font=font_st, fg="#666666")
+        self.st_my = tk.Label(p, text=" MySQL: --", bg="white", font=font_st, fg="#666666")
         self.st_my.pack(side="left", padx=40)
-        self.st_ms = tk.Label(p, text="🪟 MS SQL: --", bg="white", font=font_st, fg="#666666")
+        self.st_ms = tk.Label(p, text=" MS SQL: --", bg="white", font=font_st, fg="#666666")
         self.st_ms.pack(side="left", padx=40)
 
-        # Блок управління
         ctrl = tk.Frame(main_container, bg=COLOR_BG)
         ctrl.pack(fill="x", pady=(0, 15))
 
-        self.btn_initial = tk.Button(ctrl, text="📥 Первинне завантаження", bg=COLOR_PRIMARY, fg="white",
+        self.btn_initial = tk.Button(ctrl, text=" Первинне завантаження", bg=COLOR_PRIMARY, fg="white",
                                      font=("Segoe UI Bold", 11), relief="flat", padx=20, pady=8, cursor="hand2",
                                      command=lambda: self.start_sync("initial"))
         self.btn_initial.pack(side="left", padx=(0, 10))
 
-        self.btn_delta = tk.Button(ctrl, text="🔄 Дельта-завантаження", bg=COLOR_SECONDARY, fg="white",
+        self.btn_delta = tk.Button(ctrl, text=" Дельта-завантаження", bg=COLOR_SECONDARY, fg="white",
                                    font=("Segoe UI Bold", 11), relief="flat", padx=20, pady=8, cursor="hand2",
                                    command=lambda: self.start_sync("delta"))
         self.btn_delta.pack(side="left")
@@ -133,7 +130,6 @@ class BKRLocalCollector:
                                   font=("Consolas", 11, "bold"), padx=15, pady=6)
         self.ram_label.pack()
 
-        # Термінал логів та прогрес-бар
         tk.Label(main_container, text="Журнал ETL-процесів:", bg=COLOR_BG, font=("Segoe UI Semibold", 10),
                  fg=COLOR_TEXT).pack(anchor="w", pady=(5, 5))
 
@@ -147,7 +143,7 @@ class BKRLocalCollector:
 
     def open_settings(self):
         set_win = tk.Toplevel(self.root)
-        set_win.title("⚙️ Налаштування підключень")
+        set_win.title(" Налаштування підключень")
         set_win.geometry("800x600")
         set_win.configure(bg=COLOR_BG)
         set_win.transient(self.root)
@@ -179,7 +175,7 @@ class BKRLocalCollector:
 
         btn_frame = tk.Frame(set_win, bg=COLOR_BG)
         btn_frame.pack(fill="x", pady=15)
-        tk.Button(btn_frame, text="💾 Зберегти налаштування", bg=COLOR_PRIMARY, fg="white", font=("Segoe UI Bold", 11),
+        tk.Button(btn_frame, text=" Зберегти налаштування", bg=COLOR_PRIMARY, fg="white", font=("Segoe UI Bold", 11),
                   relief="flat", padx=30, pady=8, cursor="hand2",
                   command=lambda: self.save_settings_action(set_win)).pack()
 
@@ -211,15 +207,15 @@ class BKRLocalCollector:
         try:
             res = requests.get(f"{self.cloud_url}/verify-me", headers={"X-Tenant-Key": key}, timeout=5)
             if res.status_code == 200:
-                self.st_cloud.config(text="☁️ Cloud API: ✅", fg=COLOR_SUCCESS)
+                self.st_cloud.config(text="☁️ Cloud API: ", fg=COLOR_SUCCESS)
             else:
-                self.st_cloud.config(text="☁️ Cloud API: 🔑", fg="orange")
+                self.st_cloud.config(text="☁️ Cloud API: ", fg="orange")
         except:
-            self.st_cloud.config(text="☁️ Cloud API: ❌", fg=COLOR_ERROR)
+            self.st_cloud.config(text="☁️ Cloud API:", fg=COLOR_ERROR)
 
-        db_checks = [("pg", self.st_pg, "🐘 Postgres"),
-                     ("mysql", self.st_my, "🐬 MySQL"),
-                     ("mssql", self.st_ms, "🪟 MS SQL")]
+        db_checks = [("pg", self.st_pg, " Postgres"),
+                     ("mysql", self.st_my, " MySQL"),
+                     ("mssql", self.st_ms, " MS SQL")]
 
         for k, label, prefix in db_checks:
             try:
@@ -272,12 +268,11 @@ class BKRLocalCollector:
             final_sql = base_query
 
             if mode == "delta":
-                try: # Внутрішній try блок для дельта-завантаження
+                try:
                     sync_status = requests.get(f"{self.cloud_url}/api/sync/status", headers=headers, timeout=5)
                     if sync_status.status_code == 200:
                         last_sync_ts = sync_status.json().get("last_sync_date")
                         if last_sync_ts:
-                            # Очистка формату дати від 'T' та зони для універсальності
                             clean_ts = last_sync_ts.replace('T', ' ')[:19]
                             self.log(f"Отримано маркер часу: Фільтрація дат після {clean_ts}", "Warning")
 

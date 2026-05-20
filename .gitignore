@@ -22,6 +22,7 @@ backend/config.json
 *.xlsx
 *.csv
 online_retail_II.xlsx
+backup_postgresql
 
 node_modules/
 frontend/node_modules/

@@ -44,8 +44,147 @@ import type { TooltipProps } from "recharts";
 import PlotlyChart from "react-plotly.js";
 import  api from "../api/axios";
 
+const insightCache: Record<string, string> = {};
 const Plot = (PlotlyChart as any).default || PlotlyChart;
 const drawerWidth = 240;
+
+
+
+interface RFMInsightBlockProps {
+  businessType: string;
+  clusterName: string;
+  recency: number;
+  frequency: number;
+  monetary: number;
+}
+
+const RFMInsightBlock: React.FC<RFMInsightBlockProps> = ({
+  businessType, clusterName, recency, frequency, monetary,
+}) => {
+  const [insight, setInsight] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!clusterName) return;
+      const cacheKey = `rfm_${clusterName}_${businessType}`;
+      if (insightCache[cacheKey]) {
+        setInsight(insightCache[cacheKey]);
+        setLoading(false);
+        return;
+      }
+      const controller = new AbortController();
+      setLoading(true);
+
+      try {
+        const response = await api.post("/api/insights/rfm", {
+          business_type: businessType || "Електронна комерція",
+          cluster_name: clusterName,
+          recency,
+          frequency,
+          monetary,
+        }, { signal: controller.signal });
+        
+        const result = response.data.insight;
+        insightCache[cacheKey] = result; 
+        setInsight(result);
+      } catch (error: any) {
+        if (error.name !== 'CanceledError') {
+          setInsight("Не вдалося завантажити поради.");
+        }
+      } finally {
+        setLoading(false);
+      }
+      return () => controller.abort();
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [clusterName, businessType, recency, frequency, monetary]);
+
+  return (
+    <Paper sx={{ p: 3, mt: 2, bgcolor: "#fcfcff", borderLeft: "4px solid #2196f3" }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#1a237e", mb: 1 }}>
+       Інтелектуальні бізнес-поради для сегмента: "{clusterName}"
+      </Typography>
+      {loading ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 1 }}>
+          <CircularProgress size={20} />
+          <Typography variant="body2" color="textSecondary">Генерація стратегії рішення...</Typography>
+        </Box>
+      ) : (
+        <Typography variant="body2" sx={{ whiteSpace: "pre-line", color: "#37474f", lineHeight: 1.6 }}>
+          {insight || "Оберіть клієнтський сегмент на діаграмі для формування унікальної маркетингової стратегії"}
+        </Typography>
+      )}
+    </Paper>
+  );
+};
+
+interface FPGrowthInsightBlockProps {
+  businessType: string;
+  itemA: string;
+  itemB: string;
+  confidence: number;
+}
+
+const FPGrowthInsightBlock: React.FC<FPGrowthInsightBlockProps> = ({
+  businessType,
+  itemA,
+  itemB,
+  confidence,
+}) => {
+  const [insight, setInsight] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!itemA || !itemB) return;
+
+    const getFPGrowthInsight = async () => {
+      const cacheKey = `fp_${itemA}_${itemB}_${confidence}`;
+        if (insightCache[cacheKey]) {
+        setInsight(insightCache[cacheKey]);
+        return;
+       }
+      setLoading(true);
+      try {
+        const response = await api.post("/api/insights/fpgrowth", {
+          business_type: businessType || "Електронна комерція",
+          item_a: itemA,
+          item_b: itemB,
+          confidence: confidence,
+        });
+        const result = response.data.insight;
+        insightCache[cacheKey] = result;
+         setInsight(result);
+      } catch (error) {
+        console.error("Помилка завантаження стратегій кошика:", error);
+        setInsight("Не вдалося згенерувати рекомендації для крос-продажів");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getFPGrowthInsight();
+  }, [itemA, itemB, businessType, confidence]);
+
+  return (
+    <Paper sx={{ p: 3, mt: 2, bgcolor: "#fffcf5", borderLeft: "4px solid #ff9800" }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "#e65100", mb: 1 }}>
+        Рекомендація щодо спільного продажу: {itemA} → {itemB}
+      </Typography>
+      {loading ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 1 }}>
+          <CircularProgress size={20} color="warning" />
+          <Typography variant="body2" color="textSecondary">Розрахунок моделі комерціалізації...</Typography>
+        </Box>
+      ) : (
+        <Typography variant="body2" sx={{ whiteSpace: "pre-line", color: "#37474f", lineHeight: 1.6 }}>
+          {insight || "Оберіть правило асоціації в таблиці для генерації наборів та акційних пропозицій"}
+        </Typography>
+      )}
+    </Paper>
+  );
+};
 
 interface AssociationRule {
   if_bought: string[];
@@ -178,6 +317,16 @@ export const Dashboard: React.FC = () => {
     setYDomain(["auto", "auto"]);
     setIsZoomed(false);
   }, []);
+
+  const [businessType] = useState<string>("Магазин техніки та електроніки"); 
+
+  const [selectedRFM, setSelectedRFM] = useState<{
+    name: string; r: number; f: number; m: number;
+  } | null>(null);
+
+  const [selectedRule, setSelectedRule] = useState<{
+    itemA: string; itemB: string; confidence: number;
+  } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -322,7 +471,7 @@ export const Dashboard: React.FC = () => {
         password: newAnalystPassword,
       });
       setSuccessMsg(
-        "✓ Новий обліковий запис бізнес-аналітика успішно збережено в базі сховища",
+        " Новий обліковий запис бізнес-аналітика успішно збережено в базі сховища",
       );
       setNewAnalystEmail("");
       setNewAnalystPassword("");
@@ -344,7 +493,7 @@ export const Dashboard: React.FC = () => {
       return;
     try {
       await api.delete(`/api/admin/analysts/${id}`);
-      setSuccessMsg("✓ Обліковий запис успішно деактивовано (видалено)");
+      setSuccessMsg(" Обліковий запис успішно деактивовано (видалено)");
       fetchAnalysts();
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch {
@@ -363,7 +512,7 @@ export const Dashboard: React.FC = () => {
         min_threshold: minConfidence,
       });
       setSuccessMsg(
-        "⚙️ Пайплайн Data Mining запущено у фоновому режимі...",
+        " Пайплайн Data Mining запущено у фоновому режимі...",
       );
       let attempts = 0;
       const maxAttempts = 15;
@@ -375,7 +524,7 @@ export const Dashboard: React.FC = () => {
           (lastFpTime === 0 && newReportTime > 0)
         ) {
           clearInterval(pollInterval);
-          setSuccessMsg("✓ Фоновий аналіз успішно завершено, дані оновлено");
+          setSuccessMsg(" Фоновий аналіз успішно завершено, дані оновлено");
           setLoading(false);
           zoomOut();
           setTimeout(() => setSuccessMsg(""), 4000);
@@ -401,10 +550,10 @@ export const Dashboard: React.FC = () => {
         min_support: minSupport,
         min_threshold: minConfidence,
       });
-      setSuccessMsg("⚙️ Ініційовано перерахунок K-Means Clustering у фоні...");
+      setSuccessMsg("Ініційовано перерахунок K-Means Clustering у фоні...");
       setTimeout(async () => {
         await fetchRFMResults();
-        setSuccessMsg("✓ Параметри сегментації успішно перераховано");
+        setSuccessMsg(" Параметри сегментації успішно перераховано");
         setTimeout(() => setSuccessMsg(""), 4000);
       }, 4000);
     } catch {
@@ -415,7 +564,7 @@ export const Dashboard: React.FC = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(tenantKey);
-    setSuccessMsg("📋 Ключ інтеграції успішно скопійовано в буфер обміну");
+    setSuccessMsg("Ключ інтеграції успішно скопійовано в буфер обміну");
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
@@ -500,6 +649,12 @@ export const Dashboard: React.FC = () => {
       mode: "markers",
       type: "scatter",
       name: `Сегмент ${clusterData.cluster} (${clusterData.customer_count} чол)`,
+      customdata: [{
+        name: `Кластер ${clusterData.cluster}`,
+        r: clusterData.recency,
+        f: clusterData.frequency,
+        m: clusterData.monetary
+      }],
       marker: {
         size: [clusterData.monetary],
         sizemode: "area",
@@ -538,6 +693,19 @@ export const Dashboard: React.FC = () => {
         useResizeHandler={true}
         style={{ width: "100%", height: "100%", minHeight: "500px" }}
         config={{ responsive: true, displaylogo: false }}
+        onClick={(data: any) => {
+          if (data && data.points && data.points[0]) {
+            const pointData = data.points[0].customdata;
+            if (pointData) {
+              setSelectedRFM({
+                name: pointData.name,
+                r: pointData.r,
+                f: pointData.f,
+                m: pointData.m
+              });
+            }
+          }
+        }}
       />
     );
   };
@@ -725,7 +893,7 @@ export const Dashboard: React.FC = () => {
                       mb: 1,
                     }}
                   >
-                    Загальний Валовий Дохід
+                    Загальний валовий дохід
                   </Typography>
                   {loading ? (
                     <Skeleton width="80%" height={60} />
@@ -876,7 +1044,7 @@ export const Dashboard: React.FC = () => {
                 sx={{ color: "#424242", mb: 2, lineHeight: 1.6 }}
               >
                 Дана платформа та реалізує повноцінний закритий цикл архітектури
-                бізнес-аналітики (BI) для систем електронної комерції
+                бізнес-аналітики для систем електронної комерції
               </Typography>
               <Typography
                 variant="body2"
@@ -887,7 +1055,7 @@ export const Dashboard: React.FC = () => {
                   borderRadius: 2,
                 }}
               >
-                💡 <strong>Порада по роботі:</strong> якщо KPI показують нулі,
+                 <strong>Порада по роботі:</strong> якщо KPI показують нулі,
                 скористайтеся вкладкою <strong>Tenant Settings</strong>, щоб
                 скопіювати токен, запустити десктопний ETL-модуль, виконайте
                 вивантаження даних і запустити математичні ядра у відповідних
@@ -897,7 +1065,7 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {currentView === "Market Basket Rules" && (
+       {currentView === "Market Basket Rules" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
             <Box sx={{ mb: 4 }}>
               <Typography
@@ -913,8 +1081,7 @@ export const Dashboard: React.FC = () => {
               >
                 Правила з <strong>високим Lift {">"} 2 (зелені ромби)</strong>{" "}
                 демонструють найвищу ефективність спільних покупок і мають
-                використовуватися для рекомендаційних систем. Графік відображає
-                топ-300 найсильніших правил.
+                використовуватися для рекомендаційних систем. Натисніть на правило в таблиці, щоб отримати поради.
               </Typography>
             </Box>
             <Grid container spacing={3}>
@@ -1005,7 +1172,7 @@ export const Dashboard: React.FC = () => {
                         borderRadius: 20,
                       }}
                     >
-                      Скинути Зум
+                      Скинути зум
                     </Button>
                   )}
                   <Box sx={{ flexGrow: 1, mt: 2, position: "relative" }}>
@@ -1134,6 +1301,8 @@ export const Dashboard: React.FC = () => {
                     borderRadius: 3,
                     border: "1px solid #e0e0e0",
                     overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
                   <Box
@@ -1172,7 +1341,16 @@ export const Dashboard: React.FC = () => {
                         </TableHead>
                         <TableBody>
                           {allChartData.map((rule, index) => (
-                            <TableRow key={index} hover>
+                            <TableRow 
+                              key={index} 
+                              hover
+                              onClick={() => setSelectedRule({
+                                itemA: rule.name.split(" -> ")[0],
+                                itemB: rule.name.split(" -> ")[1],
+                                confidence: rule.y * 100
+                              })}
+                              style={{ cursor: "pointer" }}
+                            >
                               <TableCell sx={{ color: "#616161" }}>
                                 {rule.name.split(" -> ")[0]}
                               </TableCell>
@@ -1216,12 +1394,22 @@ export const Dashboard: React.FC = () => {
                       Немає даних
                     </Typography>
                   )}
+
+                  {selectedRule && (
+                    <Box sx={{ p: 3, borderTop: "1px solid #e0e0e0" }}>
+                      <FPGrowthInsightBlock
+                        businessType={businessType}
+                        itemA={selectedRule.itemA}
+                        itemB={selectedRule.itemB}
+                        confidence={selectedRule.confidence}
+                      />
+                    </Box>
+                  )}
                 </Paper>
               </Grid>
             </Grid>
           </Box>
         )}
-
 
         {currentView === "RFM Segmentation" && (
           <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
@@ -1240,7 +1428,7 @@ export const Dashboard: React.FC = () => {
                 <strong>Вісь X</strong> — Recency (Давність),{" "}
                 <strong>Вісь Y</strong> — Frequency (Частота).{" "}
                 <strong>Розмір бульбашки</strong> відповідає за Monetary (суму
-                витрат).
+                витрат). Натисніть на кластер, щоб отримати бізнес-рекомендації.
               </Typography>
             </Box>
             <Grid container spacing={3}>
@@ -1252,6 +1440,8 @@ export const Dashboard: React.FC = () => {
                     borderRadius: 3,
                     border: "1px solid #e0e0e0",
                     backgroundColor: "#ffffff",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
                   <Box
@@ -1309,6 +1499,16 @@ export const Dashboard: React.FC = () => {
                     >
                       Дані RFM відсутні.
                     </Typography>
+                  )}
+
+                  {selectedRFM && (
+                    <RFMInsightBlock
+                      businessType={businessType}
+                      clusterName={selectedRFM.name}
+                      recency={selectedRFM.r}
+                      frequency={selectedRFM.f}
+                      monetary={selectedRFM.m}
+                    />
                   )}
                 </Paper>
               </Grid>

@@ -53,7 +53,7 @@ def fill_pg(url, df):
 
             if i % 5000 == 0:
                 print(f"  [PG] Оброблено {i} / {total} рядків...")
-                conn.commit()  # проміжний коміт для звільнення пам'яті бази
+                conn.commit()
 
         conn.commit()
 

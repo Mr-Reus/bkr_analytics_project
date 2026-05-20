@@ -81,13 +81,10 @@ cumulative_variance = np.cumsum(explained_variance_ratio)
 
 log(" Побудова графіка...")
 plt.figure(figsize=(11, 6))
-# стовпчики дисперсії
 bars = plt.bar(range(1, n_features + 1), explained_variance_ratio,
                alpha=0.7, color='#3498db', label='Дисперсія компоненти (%)')
-# лінія накопичення
 plt.plot(range(1, n_features + 1), cumulative_variance,
          marker='o', color='#e67e22', linewidth=2, markersize=8, label='Кумулятивна дисперсія (%)')
-# текстові підписи відсотків
 for i, var in enumerate(cumulative_variance):
     plt.text(i + 1, var + 3, f'{var:.1f}%', ha='center', fontsize=10, fontweight='bold')
 plt.title(f'Аналіз головних компонент (PCA) | Tenant {TARGET_TENANT_ID}', fontsize=14, pad=20)

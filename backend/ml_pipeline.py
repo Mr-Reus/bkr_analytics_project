@@ -54,7 +54,6 @@ class BKRMachineLearningPipeline:
         return results
 
     def _cleanup_old_results(self, report_type: str, keep_limit: int = 3):
-        """Видаляє застарілі результати, залишаючи лише останні N (data retention policy)"""
         print(f"  ->  Очищення застарілих звітів '{report_type}' (залишаємо {keep_limit} останніх)...")
         query = text("""
             DELETE FROM analysis_results
